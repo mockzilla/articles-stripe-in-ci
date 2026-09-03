@@ -1,0 +1,9 @@
+filter:
+  include:
+    paths:
+      - /v1/customers
+      - '/v1/customers/{customer}'
+      - /v1/payment_intents
+      - '/v1/payment_intents/{intent}'
+      - '/v1/payment_intents/{intent}/confirm'
+      - /v1/refunds

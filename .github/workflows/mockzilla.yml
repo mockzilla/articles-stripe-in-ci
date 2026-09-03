@@ -1,0 +1,51 @@
+name: mockzilla
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      url: ${{ steps.mockzilla.outputs.url }}
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the mockzilla CLI
+        run: |
+          tag=$(gh release view --repo mockzilla/mockzilla --json tagName -q .tagName)
+          curl -fsSL -o "$RUNNER_TEMP/mockzilla" \
+            "https://github.com/mockzilla/mockzilla/releases/download/$tag/mockzilla-$tag-linux-amd64"
+          chmod +x "$RUNNER_TEMP/mockzilla"
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+
+      - name: Trim the spec from Stripe's published document
+        run: make spec
+
+      - uses: mockzilla/actions@v1
+        id: mockzilla
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Separate so a red run says which half broke: the simulation went out, or
+  # the tests against it failed.
+  test:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - run: make test
+        env:
+          STRIPE_BASE_URL: ${{ needs.publish.outputs.url }}/stripe

@@ -1,0 +1,5 @@
+# Uncomment to add latency or inject errors.
+# latency: 120ms
+# errors:
+#   p2: 500
+#   p5: 429
