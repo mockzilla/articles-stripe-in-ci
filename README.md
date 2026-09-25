@@ -49,8 +49,10 @@ STRIPE_BASE_URL=http://localhost:2200/stripe make test
 main, and runs the same tests against the deployed simulation. The `GITHUB_TOKEN` is what proves
 the repository is yours, so there is no key to configure.
 
-The simulation comes up at `https://api.mockz.io/gh/<org>/<repo>`, with these
-endpoints under `/stripe`.
+The simulation comes up at a host of its own, `https://<repo>.api.mockz.io`,
+with these endpoints under `/stripe`. If that name is taken, it gets a number,
+like `<repo>-2`. The tests take the address from the action's `url` output, so
+they never have to guess it.
 
 The workflow curls one endpoint before running the tests. A freshly deployed
 simulation reports itself active before it is warm, and the request that builds
